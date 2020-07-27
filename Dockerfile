@@ -1,50 +1,86 @@
-# Start FROM Nvidia PyTorch image https://ngc.nvidia.com/catalog/containers/nvidia:pytorch
-FROM nvcr.io/nvidia/pytorch:20.03-py3
-RUN pip install -U gsutil
+FROM nvidia/cuda:9.2-devel-ubuntu16.04
+LABEL maintainer="nweir <nweir@iqt.org>"
 
-# Create working directory
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
-
-# Copy contents
-COPY . /usr/src/app
-
-# Install dependencies (pip or conda)
-#RUN pip install -r requirements.txt
-
-# Copy weights
-#RUN python3 -c "from models import *; \
-#attempt_download('weights/yolov5s.pt'); \
-#attempt_download('weights/yolov5m.pt'); \
-#attempt_download('weights/yolov5l.pt')"
+ENV CUDNN_VERSION 7.3.0.29
+LABEL com.nvidia.cudnn.version="${CUDNN_VERSION}"
+ARG solaris_branch='master'
 
 
-# ---------------------------------------------------  Extras Below  ---------------------------------------------------
+# prep apt-get and cudnn
+RUN apt-get update && apt-get install -y --no-install-recommends \
+	    apt-utils \
+            libcudnn7=$CUDNN_VERSION-1+cuda9.0 \
+            libcudnn7-dev=$CUDNN_VERSION-1+cuda9.0 && \
+    apt-mark hold libcudnn7 && \
+    rm -rf /var/lib/apt/lists/*
 
-# Build and Push
-# t=ultralytics/yolov5:latest && sudo docker build -t $t . && sudo docker push $t
+# install requirements
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    bc \
+    bzip2 \
+    ca-certificates \
+    curl \
+    git \
+    libgdal-dev \
+    libssl-dev \
+    libffi-dev \
+		libncurses-dev \
+    libgl1 \
+    jq \
+    nfs-common \
+    parallel \
+    python-dev \
+    python-pip \
+    python-wheel \
+    python-setuptools \
+    unzip \
+		vim \
+    wget \
+    build-essential \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
-# Pull and Run
-# t=ultralytics/yolov5:latest && sudo docker pull $t && sudo docker run -it --ipc=host $t bash
+SHELL ["/bin/bash", "-c"]
+ENV PATH /opt/conda/bin:$PATH
 
-# Pull and Run with local directory access
-# t=ultralytics/yolov5:latest && sudo docker pull $t && sudo docker run -it --ipc=host --gpus all -v "$(pwd)"/coco:/usr/src/coco $t bash
+# install anaconda
+RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-4.5.4-Linux-x86_64.sh -O ~/miniconda.sh && \
+    /bin/bash ~/miniconda.sh -b -p /opt/conda && \
+    rm ~/miniconda.sh && \
+    /opt/conda/bin/conda clean -tipsy && \
+    ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
+    echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
+    echo "conda activate base" >> ~/.bashrc
 
-# Kill all
-# sudo docker kill "$(sudo docker ps -q)"
+# prepend pytorch and conda-forge before default channel
+RUN conda update conda && \
+    conda config --prepend channels conda-forge && \
+    conda config --prepend channels pytorch
 
-# Kill all image-based
-# sudo docker kill $(sudo docker ps -a -q --filter ancestor=ultralytics/yolov5:latest)
+# get dev version of solaris and create conda environment based on its env file
+WORKDIR /tmp/
+RUN git clone https://github.com/cosmiq/solaris.git && \
+    cd solaris && \
+    git checkout ${solaris_branch} && \
+    conda env create -f environment-gpu.yml
+ENV PATH /opt/conda/envs/solaris/bin:$PATH
 
-# Run bash for loop
-# sudo docker run --gpus all --ipc=host ultralytics/yolov5:latest while true; do python3 train.py --evolve; done
+RUN cd solaris && pip install .
 
-# Bash into running container
-# sudo docker container exec -it ba65811811ab bash
-# python -c "from utils.utils import *; create_pretrained('weights/last.pt')" && gsutil cp weights/pretrained.pt gs://*
+# install various conda dependencies into the space_base environment
+RUN conda install -n solaris \
+                     jupyter \
+                     jupyterlab \
+                     ipykernel
 
-# Bash into stopped container
-# sudo docker commit 6d525e299258 user/test_image && sudo docker run -it --gpus all --ipc=host -v "$(pwd)"/coco:/usr/src/coco --entrypoint=sh user/test_image
+# add a jupyter kernel for the conda environment in case it's wanted
+RUN source activate solaris && python -m ipykernel.kernelspec \
+    --name solaris --display-name solaris
 
-# Clean up
-# docker system prune -a --volumes
+# open ports for jupyterlab and tensorboard
+EXPOSE 8888 6006
+
+RUN ["/bin/bash"]
+
+ADD yolov5 /local_data/cosmiq/src/achadda/yolo_planes/yolov5
