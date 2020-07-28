@@ -1,0 +1,10 @@
+train: ../class_one/images/train/
+val: ../class_one/images/val/
+
+# number of classes
+nc: 8
+
+# class names
+names: ['0,0,unpowered,1','1,1,jet,2','2,1,propeller,3','3,2,jet,4','4,2,propeller,5','5,3,jet,6','6,4,jet,7','7,4,propeller,8']
+
+
