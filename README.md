@@ -38,7 +38,7 @@ class_one (or any other name)
 ```
 4. Create your container using the command `nvidia-docker build -t <name_of_container> ./`
 5. Your container should now appear in `docker container ls -l`
-6. Then run `docker exec -it <name_of_container>`
+6. Then run `docker exec -it <name_of_container> bash`
 7. Navigate to the directory `yolov5` directory on your GPU
 8. Launch the jupyter notebook using `jupyter notebook --ip 0.0.0.0 --no-browser --allow-root --port=9002`
 9. Open a browser and insert your ip into the address bar; it should look like this `http://gpu02:9002/`
