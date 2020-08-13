@@ -43,7 +43,7 @@ class_one (or any other name)
 - `cd images` and then `mkdir train`, `mkdir val`
 - In your images directory, `mv` the `PS_RGB_tiled` from the downloaded train directory to the one you just created and the test directory to the `val` directory you just created 
 - `cd ../lablels` and then `mkdir train`, `mkdir val`
-- Save the image directory paths for your `data/class_one.yaml`file (they should look something like `../class_one/images/train/` and `../class_one/images/val/`)
+- If you are creating your own custom class, save the image directory paths for your `data/class_one.yaml`file (they should look something like `../class_one/images/train/` and `../class_one/images/val/`)
 4. Create your docker image using the command `nvidia-docker build -t <name_of_image> ./`
 5. Your image should now appear when you run `docker images`
 6. Then run `NV_GPU=0,1 nvidia-docker run -it -v /dir/to/yolov5:/yolov5/ -p 9002:9002 --shm-size=64g --name <name_of_container> <name_of_image>`
