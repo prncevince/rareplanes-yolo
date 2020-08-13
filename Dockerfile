@@ -78,9 +78,12 @@ RUN conda install -n solaris \
 RUN source activate solaris && python -m ipykernel.kernelspec \
     --name solaris --display-name solaris
 
+RUN source activate solaris && conda install pytorch torchvision cudatoolkit=9.2 -c pytorch
+
+RUN source activate solaris && pip install tensorboard --upgrade
+
 # open ports for jupyterlab and tensorboard
 EXPOSE 8888 6006
 
 RUN ["/bin/bash"]
 
-ADD yolov5 /local_data/cosmiq/src/achadda/yolo_planes/yolov5
