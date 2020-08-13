@@ -41,6 +41,7 @@ class_one (or any other name)
 - The easiest way to do this is to `mkdir class_one` outside of your yolov5 directory
 - `cd class_one` and then `mkdir images`, `mkdir labels`
 - `cd images` and then `mkdir train`, `mkdir val`
+- In your images directory, `mv` the `PS_RGB_tiled` from the downloaded train directory to the one you just created and the test directory to the `val` directory you just created 
 - `cd ../lablels` and then `mkdir train`, `mkdir val`
 - Save the image directory paths for your `data/class_one.yaml`file (they should look something like `../class_one/images/train/` and `../class_one/images/val/`)
 4. Create your docker image using the command `nvidia-docker build -t <name_of_image> ./`
