@@ -39,7 +39,7 @@ class_one (or any other name)
 |     |--val
 ```
 4. Create your docker image using the command `nvidia-docker build -t <name_of_image> ./`
-5. Your container should now appear in `docker container ls -l`
+5. Your image should now appear in `docker images`
 6. Then run `NV_GPU=0,1 nvidia-docker run -it -v /dir/to/yolov5:/yolov5/ -p 9002:9002 --shm-size=64g --name <name_of_container> <name_of_image>`
 7. Navigate to the directory `yolov5` directory on your GPU
 8. Launch conda enviornment using `conda activate solaris`
