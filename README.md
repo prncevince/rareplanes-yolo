@@ -38,12 +38,13 @@ class_one (or any other name)
 |     |--train
 |     |--val
 ```
-4. Create your container using the command `nvidia-docker build -t <name_of_container> ./`
+4. Create your docker image using the command `nvidia-docker build -t <name_of_image> ./`
 5. Your container should now appear in `docker container ls -l`
-6. Then run `docker exec -it <name_of_container> bash`
+6. Then run `NV_GPU=0,1 nvidia-docker run -it -v /dir/to/yolov5:/yolov5/ -p 9002:9002 --shm-size=64g --name <name_of_container> <name_of_image>`
 7. Navigate to the directory `yolov5` directory on your GPU
-8. Launch the jupyter notebook using `jupyter notebook --ip 0.0.0.0 --no-browser --allow-root --port=9002`
-9. Open a browser and insert your ip into the address bar; it should look like this `http://gpu02:9002/`
+8. Launch conda enviornment using `conda activate solaris`
+9. Launch the jupyter notebook using `jupyter notebook --ip 0.0.0.0 --no-browser --allow-root --port=9002`
+10. Open a browser and insert your ip into the address bar; it should look like this `http://gpu02:9002/`   Use the token supplied in the terminal as your password.
 11. Open the notebook titled `1_yolo_start.ipynb`
 
 This ML pipeline uses a modified implementation of the YOLOv5 implementation found [here](https://github.com/ultralytics/yolov5). The full RarePlanes dataset can be found [here](https://www.cosmiqworks.org/rareplanes/) and helper functions for the dataset can be found [here](https://github.com/aireveries/RarePlanes). 
