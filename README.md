@@ -38,11 +38,11 @@ class_one (or any other name)
 |     |--train
 |     |--val
 ```
->> 3a. The easiest way to do this is to `mkdir class_one` outside of your yolov5 directory
->> 3b. `cd class_one` and then `mkdir images`, `mkdir labels`
->> 3c. `cd images` and then `mkdir train`, `mkdir val`
->> 3d. `cd ../lablels` and then `mkdir train`, `mkdir val`
->> 3e. Save the image directory paths for your `data/class_one.yaml`file (they should look something like `../class_one/images/train/` and `../class_one/images/val/`)
+- The easiest way to do this is to `mkdir class_one` outside of your yolov5 directory
+- `cd class_one` and then `mkdir images`, `mkdir labels`
+- `cd images` and then `mkdir train`, `mkdir val`
+- `cd ../lablels` and then `mkdir train`, `mkdir val`
+- Save the image directory paths for your `data/class_one.yaml`file (they should look something like `../class_one/images/train/` and `../class_one/images/val/`)
 4. Create your docker image using the command `nvidia-docker build -t <name_of_image> ./`
 5. Your image should now appear when you run `docker images`
 6. Then run `NV_GPU=0,1 nvidia-docker run -it -v /dir/to/yolov5:/yolov5/ -p 9002:9002 --shm-size=64g --name <name_of_container> <name_of_image>`
